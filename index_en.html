@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2001: A Space Odyssey - Frame Analysis Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Markdown 解析器 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 自訂樣式 (與中文版共享) -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 頂部導覽列 (HEADER) -->
+        <header class="app-header">
+            <div class="header-logo">
+                <i class="fa-solid fa-circle-nodes logo-icon"></i>
+                <div class="logo-text">
+                    <h1>2001: A Space Odyssey</h1>
+                    <span>Frame-by-Frame Audio-Visual & Screenplay Analysis System</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <span id="save-status"><i class="fa-solid fa-cloud-arrow-up"></i> System Ready</span>
+            </div>
+        </header>
+
+        <!-- 主要內容區域 (MAIN CONTENT AREA) -->
+        <div class="app-body">
+            <!-- 側邊欄：鏡頭導覽 (SIDEBAR: SHOT NAVIGATION) -->
+            <aside class="sidebar">
+                <div class="sidebar-search">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search shot number or sequence name...">
+                </div>
+                
+                <div class="sidebar-filter">
+                    <label for="sequence-select"><i class="fa-solid fa-bars-staggered"></i> Sequence Filter</label>
+                    <select id="sequence-select">
+                        <option value="all">All Shots (1 - 643)</option>
+                        <option value="part1_all">Part I: The Dawn of Man (1 - 82)</option>
+                        <option value="part2_all">Part II: Space Flight & Space Station (83 - 130)</option>
+                        <option value="part2_base">Part II: Lunar Base & Outpost (131 - 195)</option>
+                        <option value="part2_tma">Part II: TMA-1 Monolith Excavation (196 - 226)</option>
+                        <option value="part3_discovery">Part III: Discovery Centrifuge & Sleepers (227 - 266)</option>
+                        <option value="part3_eva">Part III: AE-35 Repair & Poole's Death (267 - 380)</option>
+                        <option value="part3_hal">Part III: Deactivating HAL 9000 (381 - 450)</option>
+                        <option value="part3_stargate">Part III: Jupiter & Beyond the Infinite (451 - 643)</option>
+                    </select>
+                </div>
+
+                <div class="shot-list" id="shot-list">
+                    <!-- 鏡頭列表將由 JS 動態產生 -->
+                    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i> Loading shot list...</div>
+                </div>
+            </aside>
+
+            <!-- 工作區：故事板與劇本 (WORKSPACE: STORYBOARD & SCREENPLAY) -->
+            <main class="workspace">
+                <!-- 鏡頭詳細資訊橫幅 (SHOT DETAILS BANNER) -->
+                <div class="shot-banner">
+                    <div class="banner-title-row">
+                        <h2 id="current-shot-title">Shot #--</h2>
+                        <span id="current-shot-seq" class="badge">Loading...</span>
+                    </div>
+                    <div class="banner-meta-row">
+                        <span><i class="fa-regular fa-clock"></i> Timecode: <strong id="current-shot-timecode">--:--:--</strong></span>
+                        <span><i class="fa-solid fa-hourglass-half"></i> Duration: <strong id="current-shot-duration">--s</strong></span>
+                    </div>
+                </div>
+
+                <!-- 故事板影格區段 (STORYBOARD CAROUSEL/GRID) -->
+                <div class="storyboard-section">
+                    <h3 class="section-title"><i class="fa-regular fa-image"></i> Storyboard Frames (3 frames per shot)</h3>
+                    <div class="frames-grid" id="frames-grid">
+                        <!-- 3 張影格圖片將由此插入 -->
+                        <div class="frame-card-placeholder"></div>
+                        <div class="frame-card-placeholder"></div>
+                        <div class="frame-card-placeholder"></div>
+                    </div>
+                </div>
+
+                <!-- 劇本內容區段 (SCREENPLAY CONTEXT) -->
+                <div class="screenplay-section">
+                    <div class="screenplay-header">
+                        <h3 class="section-title"><i class="fa-solid fa-file-lines"></i> Screenplay Context (Page <span id="script-page-range">--</span>)</h3>
+                        <div class="script-nav-buttons">
+                            <button id="btn-prev-page" class="btn-icon" title="Previous Page"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button id="btn-next-page" class="btn-icon" title="Next Page"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="screenplay-box" id="screenplay-box">
+                        <div class="script-placeholder">Loading screenplay text...</div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 編輯器：分析寫作面板 (EDITOR: ANALYSIS WRITING) -->
+            <section class="editor-panel">
+                <div class="editor-header">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" id="tab-write"><i class="fa-solid fa-pen-nib"></i> Analysis Writing</button>
+                        <button class="tab-btn" id="tab-preview"><i class="fa-solid fa-eye"></i> Live Preview</button>
+                    </div>
+                    <div class="editor-actions">
+                        <button id="btn-insert-template" class="btn-secondary" title="Load audio-visual analysis template"><i class="fa-solid fa-wand-magic-sparkles"></i> Load Template</button>
+                        <button id="btn-save" class="btn-primary"><i class="fa-solid fa-save"></i> Save Note</button>
+                    </div>
+                </div>
+
+                <div class="editor-content-area">
+                    <!-- 寫作分頁 (Write tab) -->
+                    <div class="editor-textarea-wrapper" id="editor-write-wrapper">
+                        <textarea id="note-textarea" placeholder="Write your audio-visual analysis notes here... (Markdown supported)"></textarea>
+                    </div>
+
+                    <!-- 預覽分頁 (Preview tab) -->
+                    <div class="editor-preview-wrapper hidden" id="editor-preview-wrapper">
+                        <div class="markdown-body" id="preview-content">
+                            <!-- 渲染後的 Markdown 將顯示在此 -->
+                            <p class="preview-placeholder">Your analysis preview will be displayed here...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 影格放大互動視窗 (LIGHTBOX MODAL FOR IMAGE ZOOM) -->
+    <div class="lightbox-modal" id="lightbox-modal">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+
+    <!-- 前端指令碼 -->
+    <script src="app_en.js"></script>
+</body>
+</html>
